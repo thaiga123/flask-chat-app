@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Private Chat</title>
+</head>
+<body>
+    <h1>Private Chat</h1>
+    <div id="messages">
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    </div>
+
+    <form action="/send_message" method="POST">
+        <input type="text" name="message" placeholder="Type a message">
+        <button type="submit">Send</button>
+    </form>
+</body>
+</html>
