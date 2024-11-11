@@ -31,7 +31,7 @@
             margin-left: auto;
         }
         .her-message {
-            background-color: #FA6583; /* Pink */
+            background-color: #FFB6C1; /* Pink */
             text-align: left;
             margin-right: auto;
         }
@@ -52,9 +52,17 @@
         button:hover {
             background-color: #45a049;
         }
+        #logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: red;
+        }
     </style>
 </head>
 <body>
+    <button id="logout-button" onclick="window.location.href='/logout'">Logout</button>
+
     <h1 style="text-align: center; color: white; padding: 10px; background-color: #006666; border-radius: 8px;">Private Chat</h1>
     
     <div class="message-container" id="messages">
