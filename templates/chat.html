@@ -85,13 +85,17 @@
     </footer>
 
     <script>
-        // Check if user is logged in
-        if (!sessionStorage.getItem('username')) {
-            window.location.href = '/login';
-        }
+        // Check if user is logged in by looking at sessionStorage
+        fetch('/check_session')
+            .then(response => response.json())
+            .then(data => {
+                if (!data.logged_in) {
+                    window.location.href = '/login';
+                }
+            });
 
         // Set user based on session
-        const username = sessionStorage.getItem('username');
+        const username = '{{ session["username"] }}';
         const user = (username === 'AJ') ? 'AJ' : 'Chantelle';
 
         // Send message via AJAX
