@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Private Chat</title>
     <style>
+        body {
+            background-color: rgba(35, 66, 94, 0.938);
+        }
         h1 {
             display: inline-block;
             background-color: aqua;
@@ -16,64 +19,79 @@
             text-shadow: 2px 2px 2px white;
             border-radius: 10px;
         }
-        body {
-            background-color: rgba(35, 66, 94, 0.938);
-        }
-        .messages {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+        .message-container {
+            max-width: 600px;
+            margin: auto;
         }
         .message {
-            max-width: 60%;
+            margin: 10px;
             padding: 10px;
-            border-radius: 15px;
-            margin: 5px;
-            font-family: "Gill Sans MT";
-            text-shadow: 0px 1px 1px rgb(112, 109, 109);
+            border-radius: 8px;
         }
-        .my-message {
-            background-color: blue;
-            color: white;
-            align-self: flex-start;
+        .message.AJ {
+            background-color: #ADD8E6; /* Light Blue for AJ */
+            text-align: left;
         }
-        .her-message {
-            background-color: pink;
-            color: white;
-            align-self: flex-end;
+        .message.Chantell {
+            background-color: #FFC0CB; /* Pink for Chantell */
+            text-align: right;
         }
-        form {
-            padding-left: 10px;
+        .form-container {
             margin-top: 20px;
-        }
-        footer {
             text-align: center;
-            font-size: 12px;
-            color: white;
         }
     </style>
 </head>
 <body>
-    <h1>...Private Chat App🙂...</h1>
-    <br>
-    <div class="messages" id="messages">
-        <!-- Display messages -->
+    <h1>Private Chat App🙂</h1>
+
+    <div class="message-container" id="messages">
         {% for message in messages %}
-            {% if message.sender == "me" %}
-                <div class="message my-message">{{ message.text }}</div>
-            {% else %}
-                <div class="message her-message">{{ message.text }}</div>
-            {% endif %}
+            <div class="message {{ message.user }}">
+                <strong>{{ message.user }}:</strong> {{ message.message }}
+            </div>
         {% endfor %}
     </div>
 
-    <form action="/send_message" method="POST">
-        <input type="text" name="message" placeholder="Type a message" required>
-        <button type="submit">Send</button>
-    </form>
+    <div class="form-container">
+        <form id="messageForm" method="POST" action="/send_message">
+            <input type="text" name="message" placeholder="Type a message" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
 
+    <br>
     <footer>
-        <tex><u>Developed by AJ</u></tex>
+        <p>Developed by AJ</p>
     </footer>
+
+    <script>
+        document.getElementById('messageForm').onsubmit = function(event) {
+            event.preventDefault();
+            
+            let message = event.target.message.value;
+
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `message=${message}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Add the message to the DOM
+                    let messagesDiv = document.getElementById('messages');
+                    let newMessage = document.createElement('div');
+                    newMessage.className = 'message {{ username }}';
+                    newMessage.innerHTML = '<strong>{{ username }}:</strong> ' + message;
+                    messagesDiv.appendChild(newMessage);
+                    event.target.message.value = ''; // Clear input field
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    </script>
 </body>
 </html>
