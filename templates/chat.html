@@ -3,127 +3,222 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Private Chat</title>
+    <title>Chat App</title>
     <style>
+        /* General styles */
         body {
-            background-color: rgba(35, 66, 94, 0.938);
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .message-container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 10px;
+
+        .container {
+            width: 90%;
+            max-width: 500px;
             background-color: white;
             border-radius: 10px;
-            border: 1px solid #ddd;
-            min-height: 200px;
-            overflow-y: auto;
-            margin-bottom: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
         }
-        .message {
-            padding: 8px;
-            margin-bottom: 5px;
-            border-radius: 8px;
-            width: fit-content;
-            max-width: 70%; /* Limit the message width */
+
+        .chat-container {
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            padding-right: 5px;
         }
+
+        /* Message styles */
         .my-message {
             background-color: #ADD8E6; /* Blue */
             text-align: left;
             margin-left: auto;
             margin-right: 0;
         }
+
         .her-message {
             background-color: #FA6583; /* Pink */
             text-align: right;
             margin-right: auto;
             margin-left: 0;
         }
+
+        .message {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            width: fit-content;
+            max-width: 70%; /* Limit the message width */
+            word-wrap: break-word;  /* Ensure long words break properly */
+            display: inline-block;  /* Ensure the message behaves like text */
+        }
+
         input[type="text"] {
             width: 80%;
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        .logout-btn {
+            margin-top: 10px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #f44336;
+            color: white;
+            cursor: pointer;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        /* Login Page */
+        .login-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-form input {
+            margin-bottom: 10px;
             padding: 10px;
             border-radius: 5px;
-            border: 1px solid #ddd;
+            border: 1px solid #ccc;
         }
-        button {
-            padding: 10px 15px;
+
+        .login-form button {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
             background-color: #4CAF50;
             color: white;
-            border: none;
             cursor: pointer;
-            border-radius: 5px;
         }
-        button:hover {
+
+        .login-form button:hover {
             background-color: #45a049;
         }
-        #logout-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: red;
-        }
+
     </style>
 </head>
 <body>
-    <button id="logout-button" onclick="window.location.href='/logout'">Logout</button>
 
-    <h1 style="text-align: center; color: white; padding: 10px; background-color: #006666; border-radius: 8px;">Private Chat</h1>
-    
-    <div class="message-container" id="messages">
-        <!-- Messages will be displayed here -->
-        {% for message in messages %}
-            <div class="message {{ 'my-message' if message['user'] == 'AJ' else 'her-message' }}">
-                {{ message['content'] }}
-            </div>
-        {% endfor %}
+    <div class="container">
+        <!-- Login Form -->
+        <div id="login-form" class="login-form">
+            <h2>Login</h2>
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button onclick="login()">Login</button>
+        </div>
+
+        <!-- Chat Container -->
+        <div id="chat-container" class="chat-container" style="display: none;">
+            <div id="messages"></div>
+            <input type="text" id="message" placeholder="Type a message..." onkeypress="if(event.keyCode === 13){sendMessage()}">
+            <button onclick="sendMessage()">Send</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
     </div>
-    
-    <form id="message-form">
-        <input type="text" id="message-input" name="message" placeholder="Type a message" required>
-        <button type="submit">Send</button>
-    </form>
-
-    <footer>
-        <p style="text-align: center; font-size: 12px; color: white;">Developed by AJ</p>
-    </footer>
 
     <script>
-        // Set user based on session
-        const username = '{{ session["username"] }}';
-        const user = (username === 'AJ') ? 'AJ' : 'Chantelle';
+        // Chat functionality
+        let currentUser = null;
 
-        // Send message via AJAX
-        document.getElementById('message-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const messageContent = document.getElementById('message-input').value;
-            
-            fetch('/send_message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: messageContent,
-                    user: user
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('message-input').value = '';  // Clear input field
-                appendMessage(data.message, data.user);
-            });
-        });
+        const messagesDiv = document.getElementById('messages');
+        const messageInput = document.getElementById('message');
+        const chatContainer = document.getElementById('chat-container');
+        const loginForm = document.getElementById('login-form');
 
-        // Append the new message dynamically
-        function appendMessage(messageContent, user) {
-            const messageContainer = document.getElementById('messages');
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Check login credentials
+            if (username === "AJ" && password === "AJ123") {
+                currentUser = "AJ";
+            } else if (username === "Chantelle" && password === "Chantelle123") {
+                currentUser = "Chantelle";
+            } else {
+                alert('Invalid login credentials');
+                return;
+            }
+
+            // Hide login form and show chat container
+            loginForm.style.display = 'none';
+            chatContainer.style.display = 'block';
+
+            loadMessages();
+        }
+
+        function logout() {
+            // Reset currentUser and show login form again
+            currentUser = null;
+            loginForm.style.display = 'block';
+            chatContainer.style.display = 'none';
+        }
+
+        function sendMessage() {
+            const messageText = messageInput.value;
+            if (messageText.trim() === "") return;
+
+            // Create a new message element
             const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message', user === 'AJ' ? 'my-message' : 'her-message');
-            messageDiv.textContent = messageContent;
-            messageContainer.appendChild(messageDiv);
-            messageContainer.scrollTop = messageContainer.scrollHeight; // Scroll to the bottom
+            messageDiv.classList.add('message');
+            
+            // Assign classes based on the user
+            if (currentUser === "AJ") {
+                messageDiv.classList.add('my-message');
+            } else {
+                messageDiv.classList.add('her-message');
+            }
+
+            // Set message text
+            messageDiv.innerText = messageText;
+            messagesDiv.appendChild(messageDiv);
+
+            // Clear the input
+            messageInput.value = '';
+            
+            // Scroll to the bottom
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function loadMessages() {
+            // Simulate loading previous messages (for demonstration)
+            const previousMessages = [
+                { user: 'AJ', text: 'Hello!' },
+                { user: 'Chantelle', text: 'Hi there!' }
+            ];
+
+            previousMessages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                
+                if (message.user === "AJ") {
+                    messageDiv.classList.add('my-message');
+                } else {
+                    messageDiv.classList.add('her-message');
+                }
+
+                messageDiv.innerText = message.text;
+                messagesDiv.appendChild(messageDiv);
+            });
         }
     </script>
+
 </body>
 </html>
