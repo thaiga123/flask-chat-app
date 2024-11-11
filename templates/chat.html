@@ -52,6 +52,9 @@
             color: white;
             float: right;
         }
+        .clear {
+            clear: both;
+        }
         input[type="text"] {
             width: 80%;
             padding: 10px;
@@ -76,6 +79,7 @@
                 <div class="message {% if message.sender == 'AJ' %}my-message{% else %}her-message{% endif %}">
                     {{ message.text }}
                 </div>
+                <div class="clear"></div>
             {% endfor %}
         </div>
     </div>
@@ -83,7 +87,6 @@
     <!-- Form to send a new message -->
     <form action="/send_message" method="POST">
         <input type="text" name="message" placeholder="Type a message" required>
-        <input type="hidden" name="username" value="AJ">  <!-- Hardcoded username for testing -->
         <button type="submit">Send</button>
     </form>
 
