@@ -13,12 +13,6 @@ users = {
     "Chantelle": "Chantelle123"
 }
 
-# Store user-specific messages
-user_messages = {
-    "AJ": [],
-    "Chantelle": []
-}
-
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -54,13 +48,8 @@ def logout():
 @app.route('/get_messages')
 @login_required
 def get_messages():
-    username = session['username']
-    if username == "AJ":
-        msg_data = user_messages["AJ"]
-    elif username == "Chantelle":
-        msg_data = user_messages["Chantelle"]
-    
-    return jsonify(msg_data)
+    # Retrieve all messages, user-specific styling will be handled on the frontend
+    return jsonify(messages)
 
 @app.route('/send_message', methods=['POST'])
 @login_required
@@ -68,6 +57,7 @@ def send_message():
     message = request.json['message']
     username = session['username']
     
+    # Determine message style and name based on the logged-in user
     if username == "AJ":
         color = "blue"
         side = "right"
@@ -85,7 +75,6 @@ def send_message():
         "side": side
     }
     messages.append(message_data)
-    user_messages[username].append(message_data)
 
     return jsonify({'status': 'success'}), 200
 

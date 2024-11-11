@@ -71,6 +71,7 @@
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = '';
 
+            // Display messages
             data.forEach(msg => {
                 const messageElement = document.createElement('div');
                 messageElement.classList.add('message', msg.side);
@@ -85,6 +86,9 @@
 
                 messagesDiv.appendChild(messageElement);
             });
+
+            // Scroll to the bottom of the messages div to show the latest message
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
         async function sendMessage(message) {
