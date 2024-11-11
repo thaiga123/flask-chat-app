@@ -37,7 +37,7 @@ def login():
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    data = json.loads(request.data)  # Get the JSON data
+    data = request.get_json()
     message = data['message']
     user = data['user']
     
@@ -45,7 +45,7 @@ def send_message():
     messages.append({'content': message, 'user': user})
     
     # Send a response back with the message
-    return jsonify({'status': 'success', 'message': message, 'user': user}), 200
+    return jsonify({'message': message, 'user': user})
 
 @app.route('/logout')
 def logout():
