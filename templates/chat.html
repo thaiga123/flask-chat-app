@@ -25,6 +25,17 @@
             padding: 10px;
             margin-bottom: 10px;
         }
+        .message {
+            margin-bottom: 10px;
+        }
+        .left {
+            text-align: left;
+            color: #FA6583;
+        }
+        .right {
+            text-align: right;
+            color: blue;
+        }
         form {
             display: flex;
             gap: 10px;
@@ -41,7 +52,7 @@
     </style>
 </head>
 <body>
-    <h1>...Private Chat App🙂...</h1>
+    <h1>Private Chat App 🙂</h1>
     <div id="messages"></div>
 
     <form id="chatForm">
@@ -59,10 +70,20 @@
             const data = await response.json();
             const messagesDiv = document.getElementById('messages');
             messagesDiv.innerHTML = '';
+
             data.forEach(msg => {
-                const p = document.createElement('p');
-                p.textContent = msg;
-                messagesDiv.appendChild(p);
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message', msg.side);
+                
+                const nameElement = document.createElement('strong');
+                nameElement.textContent = msg.name;
+                messageElement.appendChild(nameElement);
+                
+                const messageText = document.createElement('p');
+                messageText.textContent = msg.message;
+                messageElement.appendChild(messageText);
+
+                messagesDiv.appendChild(messageElement);
             });
         }
 
