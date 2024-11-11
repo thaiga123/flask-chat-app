@@ -18,6 +18,7 @@
             border: 1px solid #ddd;
             min-height: 200px;
             overflow-y: auto;
+            margin-bottom: 10px;
         }
         .message {
             padding: 8px;
@@ -27,12 +28,12 @@
         }
         .my-message {
             background-color: #ADD8E6; /* Blue */
-            text-align: right;
+            text-align: left;
             margin-left: auto;
         }
         .her-message {
-            background-color: #FFB6C1; /* Pink */
-            text-align: left;
+            background-color: #FA6583; /* Pink */
+            text-align: right;
             margin-right: auto;
         }
         input[type="text"] {
@@ -74,7 +75,7 @@
         {% endfor %}
     </div>
     
-    <form id="message-form" action="/send_message" method="POST">
+    <form id="message-form">
         <input type="text" id="message-input" name="message" placeholder="Type a message" required>
         <button type="submit">Send</button>
     </form>
@@ -84,16 +85,21 @@
     </footer>
 
     <script>
-        // Function to send the message via AJAX
+        // Check if user is logged in
+        if (!sessionStorage.getItem('username')) {
+            window.location.href = '/login';
+        }
+
+        // Set user based on session
+        const username = sessionStorage.getItem('username');
+        const user = (username === 'AJ') ? 'AJ' : 'Chantelle';
+
+        // Send message via AJAX
         document.getElementById('message-form').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            let messageContent = document.getElementById('message-input').value;
-
-            // Determine the user based on login
-            let user = (sessionStorage.getItem('username') === 'AJ') ? 'AJ' : 'Chantell';
-
-            // Send message using AJAX
+            const messageContent = document.getElementById('message-input').value;
+            
             fetch('/send_message', {
                 method: 'POST',
                 headers: {
@@ -106,17 +112,15 @@
             })
             .then(response => response.json())
             .then(data => {
-                // Clear the input field after sending the message
-                document.getElementById('message-input').value = '';
-                // Add the message to the chat window dynamically
+                document.getElementById('message-input').value = '';  // Clear input field
                 appendMessage(data.message, data.user);
             });
         });
 
-        // Function to append a new message to the chat
+        // Append the new message dynamically
         function appendMessage(messageContent, user) {
-            let messageContainer = document.getElementById('messages');
-            let messageDiv = document.createElement('div');
+            const messageContainer = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', user === 'AJ' ? 'my-message' : 'her-message');
             messageDiv.textContent = messageContent;
             messageContainer.appendChild(messageDiv);
