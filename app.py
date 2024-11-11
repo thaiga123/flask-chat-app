@@ -7,11 +7,15 @@ messages = []
 
 @app.route('/')
 def home():
-    return render_template('chat.html', messages=messages)
+    return render_template('chat.html')
+
+@app.route('/get_messages')
+def get_messages():
+    return jsonify(messages)
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
-    message = request.form['message']
+    message = request.json['message']
     messages.append(message)
     return jsonify({'status': 'success'}), 200
 
