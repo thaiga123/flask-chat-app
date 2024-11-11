@@ -35,26 +35,10 @@
         .left {
             text-align: left;
             color: #FA6583;
-            text-shadow:1px 1px 1px black;
-            display:inline-block;
-            background-color: lightgray;
-            padding-left:10px;
-            padding-right:10px;
-            border:1px solid black;
-            padding-top:5px;
-            border-radius:5px;
         }
         .right {
             text-align: right;
-            color: aqua;
-            text-shadow:1px 1px 1px black;
-            display:inline-block;
-            background-color: lightgray;
-            padding-left:10px;
-            padding-right:10px;
-            border:1px solid black;
-            padding-top:5px;
-            border-radius:5px
+            color: blue;
         }
         form {
             display: flex;
@@ -151,8 +135,8 @@
             }
         });
 
-        // Fetch messages every 1 seconds to simulate real-time updates
-        setInterval(fetchMessages, 1000);
+        // Fetch messages every 2 seconds to simulate real-time updates
+        setInterval(fetchMessages, 2000);
         fetchMessages();
     </script>
 </body>
