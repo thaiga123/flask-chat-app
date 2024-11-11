@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Private Chat</title>
     <style>
-        body {
-            background-color: rgba(35, 66, 94, 0.938);
-        }
         h1 {
             display: inline-block;
             background-color: aqua;
@@ -19,79 +16,84 @@
             text-shadow: 2px 2px 2px white;
             border-radius: 10px;
         }
-        .message-container {
-            max-width: 600px;
-            margin: auto;
+        body {
+            background-color: rgba(35, 66, 94, 0.938)
+        }
+        tex {
+            font-family: "gill sans mt";
+            text-shadow: 0px 1px 1px rgb(112, 109, 109);
+            margin-left: 10px
+        }
+        form {
+            padding-left: 10px;
+        }
+        #chat-window {
+            background-color: white;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
         }
         .message {
-            margin: 10px;
             padding: 10px;
-            border-radius: 8px;
+            margin: 5px 0;
+            border-radius: 5px;
+            max-width: 60%;
         }
-        .message.AJ {
-            background-color: #ADD8E6; /* Light Blue for AJ */
-            text-align: left;
+        .my-message {
+            background-color: blue;
+            color: white;
+            float: left;
         }
-        .message.Chantell {
-            background-color: #FFC0CB; /* Pink for Chantell */
-            text-align: right;
+        .her-message {
+            background-color: pink;
+            color: white;
+            float: right;
         }
-        .form-container {
-            margin-top: 20px;
-            text-align: center;
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: lightblue;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
         }
     </style>
 </head>
 <body>
-    <h1>Private Chat App🙂</h1>
-
-    <div class="message-container" id="messages">
-        {% for message in messages %}
-            <div class="message {{ message.user }}">
-                <strong>{{ message.user }}:</strong> {{ message.message }}
-            </div>
-        {% endfor %}
-    </div>
-
-    <div class="form-container">
-        <form id="messageForm" method="POST" action="/send_message">
-            <input type="text" name="message" placeholder="Type a message" required>
-            <button type="submit">Send</button>
-        </form>
-    </div>
-
+    <h1>...Private Chat App🙂...</h1>
     <br>
-    <footer>
-        <p>Developed by AJ</p>
-    </footer>
+    <div id="chat-window">
+        <div id="messages">
+            <!-- Render messages dynamically -->
+            {% for message in messages %}
+                <div class="message {% if message.sender == 'AJ' %}my-message{% else %}her-message{% endif %}">
+                    {{ message.text }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
 
-    <script>
-        document.getElementById('messageForm').onsubmit = function(event) {
-            event.preventDefault();
-            
-            let message = event.target.message.value;
+    <!-- Form to send a new message -->
+    <form action="/send_message" method="POST">
+        <input type="text" name="message" placeholder="Type a message" required>
+        <input type="hidden" name="username" value="AJ">  <!-- Hardcoded username for testing -->
+        <button type="submit">Send</button>
+    </form>
 
-            fetch('/send_message', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `message=${message}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    // Add the message to the DOM
-                    let messagesDiv = document.getElementById('messages');
-                    let newMessage = document.createElement('div');
-                    newMessage.className = 'message {{ username }}';
-                    newMessage.innerHTML = '<strong>{{ username }}:</strong> ' + message;
-                    messagesDiv.appendChild(newMessage);
-                    event.target.message.value = ''; // Clear input field
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
-    </script>
 </body>
+
+<br>
+
+<footer>
+    <tex>
+        <u>Developed by AJ</u>
+    </tex>
+</footer>
 </html>
