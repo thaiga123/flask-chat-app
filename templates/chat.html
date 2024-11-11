@@ -5,98 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Private Chat</title>
     <style>
-        h1 {
-            display: inline-block;
-            background-color: aqua;
-            border: 1px solid black;
-            padding-left: 10px;
-            padding-right: 10px;
-            padding-bottom: 5px;
-            font-family: cursive;
-            text-shadow: 2px 2px 2px white;
-            border-radius: 10px;
-        }
         body {
-            background-color: rgba(35, 66, 94, 0.938)
+            background-color: rgba(35, 66, 94, 0.938);
+            font-family: Arial, sans-serif;
         }
-        tex {
-            font-family: "gill sans mt";
-            text-shadow: 0px 1px 1px rgb(112, 109, 109);
-            margin-left: 10px
-        }
-        form {
-            padding-left: 10px;
-        }
-        #chat-window {
+        .message-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 10px;
             background-color: white;
-            padding: 20px;
-            height: 400px;
-            overflow-y: auto;
+            border-radius: 10px;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 10px;
+            min-height: 200px;
+            overflow-y: auto;
         }
         .message {
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            max-width: 60%;
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 8px;
+            width: fit-content;
         }
         .my-message {
-            background-color: blue;
-            color: white;
-            float: left;
+            background-color: #ADD8E6; /* Blue */
+            text-align: right;
+            margin-left: auto;
         }
         .her-message {
-            background-color: pink;
-            color: white;
-            float: right;
-        }
-        .clear {
-            clear: both;
+            background-color: #FA6583; /* Pink */
+            text-align: left;
+            margin-right: auto;
         }
         input[type="text"] {
             width: 80%;
             padding: 10px;
-            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
         }
         button {
-            padding: 10px 20px;
-            background-color: lightblue;
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
             border: none;
             cursor: pointer;
             border-radius: 5px;
         }
+        button:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
-    <h1>...Private Chat App🙂...</h1>
-    <br>
-    <div id="chat-window">
-        <div id="messages">
-            <!-- Render messages dynamically -->
-            {% for message in messages %}
-                <div class="message {% if message.sender == 'AJ' %}my-message{% else %}her-message{% endif %}">
-                    {{ message.text }}
-                </div>
-                <div class="clear"></div>
-            {% endfor %}
-        </div>
+    <h1 style="text-align: center; color: white; padding: 10px; background-color: #006666; border-radius: 8px;">Private Chat</h1>
+    
+    <div class="message-container" id="messages">
+        <!-- Messages will be displayed here -->
+        {% for message in messages %}
+            <div class="message {{ 'my-message' if message['user'] == 'AJ' else 'her-message' }}">
+                {{ message['content'] }}
+            </div>
+        {% endfor %}
     </div>
-
-    <!-- Form to send a new message -->
-    <form action="/send_message" method="POST">
-        <input type="text" name="message" placeholder="Type a message" required>
+    
+    <form id="message-form" action="/send_message" method="POST">
+        <input type="text" id="message-input" name="message" placeholder="Type a message" required>
         <button type="submit">Send</button>
     </form>
 
+    <footer>
+        <p style="text-align: center; font-size: 12px; color: white;">Developed by AJ</p>
+    </footer>
+
+    <script>
+        // Function to send the message via AJAX
+        document.getElementById('message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let messageContent = document.getElementById('message-input').value;
+
+            // Determine the user based on login
+            let user = (sessionStorage.getItem('username') === 'AJ') ? 'AJ' : 'Chantell';
+
+            // Send message using AJAX
+            fetch('/send_message', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    message: messageContent,
+                    user: user
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear the input field after sending the message
+                document.getElementById('message-input').value = '';
+                // Add the message to the chat window dynamically
+                appendMessage(data.message, data.user);
+            });
+        });
+
+        // Function to append a new message to the chat
+        function appendMessage(messageContent, user) {
+            let messageContainer = document.getElementById('messages');
+            let messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', user === 'AJ' ? 'my-message' : 'her-message');
+            messageDiv.textContent = messageContent;
+            messageContainer.appendChild(messageDiv);
+            messageContainer.scrollTop = messageContainer.scrollHeight; // Scroll to the bottom
+        }
+    </script>
 </body>
-
-<br>
-
-<footer>
-    <tex>
-        <u>Developed by AJ</u>
-    </tex>
-</footer>
 </html>
