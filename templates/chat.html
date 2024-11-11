@@ -25,16 +25,19 @@
             margin-bottom: 5px;
             border-radius: 8px;
             width: fit-content;
+            max-width: 70%; /* Limit the message width */
         }
         .my-message {
             background-color: #ADD8E6; /* Blue */
             text-align: left;
             margin-left: auto;
+            margin-right: 0;
         }
         .her-message {
             background-color: #FA6583; /* Pink */
             text-align: right;
             margin-right: auto;
+            margin-left: 0;
         }
         input[type="text"] {
             width: 80%;
@@ -85,15 +88,6 @@
     </footer>
 
     <script>
-        // Check if user is logged in by looking at sessionStorage
-        fetch('/check_session')
-            .then(response => response.json())
-            .then(data => {
-                if (!data.logged_in) {
-                    window.location.href = '/login';
-                }
-            });
-
         // Set user based on session
         const username = '{{ session["username"] }}';
         const user = (username === 'AJ') ? 'AJ' : 'Chantelle';
